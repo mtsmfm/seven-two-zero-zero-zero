@@ -20,14 +20,38 @@
     "type": "git",
     "url": "https://github.com/github/hubot.git"
   },
+  "directories": {
+    "test": "test/"
+  },
   "dependencies": {
     "hubot": ">= 2.6.0 < 3.0.0",
     "hubot-idobata": "0.0.3",
     "hubot-scripts": ">= 2.5.0 < 3.0.0",
-    "idobata-client": "0.0.2"
+    "idobata-client": "0.0.2",
+    "moment": "^2.7.0"
   },
   "engines": {
     "node": ">= 0.8.x",
     "npm": ">= 1.1.x"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.7.1",
+    "espower-loader": "^0.7.1",
+    "grunt": "^0.4.5",
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-coffee": "^0.10.1",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-espower": "^0.7.1",
+    "grunt-mocha-test": "^0.10.2",
+    "hubot-test-helper": "^0.0.2",
+    "intelli-espower-loader": "^0.1.0",
+    "mocha": "^1.20.0",
+    "power-assert": "^0.7.2",
+    "underscore": "^1.6.0"
+  },
+  "scripts": {
+    "test": "grunt test",
+    "start": "grunt"
   }
 }
