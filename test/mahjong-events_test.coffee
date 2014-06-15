@@ -56,3 +56,19 @@ describe 'mahjong-events', ->
     it '揃った後には登録できないこと', ->
       room.user.say 'chibamem', '@hubot true'
       assert.deepEqual room.messages.pop(), ['hubot', '面子が揃っちゃいました ><']
+
+    context '募集時刻の 1 時間前になった場合', ->
+      beforeEach ->
+        moment = require('moment')
+        tk = require('timekeeper')
+
+        heldAt = moment('2014/05/22 18:00')
+        tk.travel(heldAt.valueOf())
+        console.log moment()
+
+      it '', (done) ->
+        this.timeout(1000 * 60 * 2)
+        setTimeout ->
+          console.log room.messages
+          done()
+        , 1000 * 70

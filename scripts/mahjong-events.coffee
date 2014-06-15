@@ -7,7 +7,7 @@
 moment = require('moment')
 
 class MahjongEvent
-  constructor: (@host, heldAt, @place) ->
+  constructor: (@host, @room, heldAt, @place) ->
     @heldAt = moment(heldAt, 'M/D H:m')
     throw "Invalid format of date : #{heldAt}" unless @heldAt.isValid()
     @attendees = [@host]
@@ -37,15 +37,35 @@ class Nodoka
     mentions = event.attendees.map((user) -> "@#{user}").join(' ')
     "@all #{event.toString()} での麻雀の面子が揃いました! #{mentions} です"
 
+  @messageNotification: (event) ->
+    mentions = event.attendees.map((user) -> "@#{user}").join(' ')
+    "#{mentions} #{event.toString()} の麻雀がそろそろ始まりますよ"
+
   @messageInvalidFormat: ->
     '面子募集のフォーマットがおかしいです (面子 月/日 時間- 場所)'
 
+cron = require('cron').CronJob
+
 module.exports = (robot) ->
+  new cron '*/1 * * * *', =>
+    console.log '---------------------------------------------------------'
+    console.log robot
+    console.log event
+    return unless event
+    return unless event.isFull()
+
+    console.log 'hi'
+    console.log event.heldAt.diff(moment(), 'hours', true)
+    if event.heldAt.diff(moment(), 'hours', true) <= 1
+      robot.send {room: event.room}, Nodoka.messageNotification(event)
+      event = null
+  , null, true
+
   event = null
 
   robot.respond /面子 (.*)- (.*)$/i, (msg) ->
     try
-      event = new MahjongEvent(msg.message.user.name, msg.match[1], msg.match[2])
+      event = new MahjongEvent(msg.message.user.name, msg.message.room, msg.match[1], msg.match[2])
 
       msg.send Nodoka.messageOnCreated(event)
     catch
