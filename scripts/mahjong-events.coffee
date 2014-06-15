@@ -20,6 +20,22 @@ class MahjongEvent
   isFull: ->
     @attendees.length == 4
 
+class Nodoka
+  @messageOnCreated: (event) ->
+    "@all #{event.toString()} で麻雀をやるそうですよ"
+
+  @messageWhenFull: (event) ->
+    '面子が揃っちゃいました ><'
+
+  @messageOnAttended: (event) ->
+    [attendees..., newAttendee] = event.attendees
+    mentions = attendees.map((user) -> "@#{user}").join(' ')
+    "#{mentions} #{event.toString()} での麻雀に @#{newAttendee} が参加されます"
+
+  @messageOnFilled: (event) ->
+    mentions = event.attendees.map((user) -> "@#{user}").join(' ')
+    "@all #{event.toString()} での麻雀の面子が揃いました! #{mentions} です"
+
 module.exports = (robot) ->
   event = null
 
@@ -27,21 +43,18 @@ module.exports = (robot) ->
     try
       event = new MahjongEvent(msg.message.user.name, msg.match[1], msg.match[2])
 
-      msg.send "@all #{event.toString()} で麻雀をやるそうですよ"
+      msg.send Nodoka.messageOnCreated(event)
     catch
       # TODO invalid だった場合の処理
 
   robot.respond /true$/i, (msg) ->
     # TODO ないときのメッセージ
     return unless event
-    return msg.send '面子が揃っちゃいました ><' if event.isFull()
+    return msg.send Nodoka.messageWhenFull(event) if event.isFull()
 
     event.attend(msg.message.user.name)
 
     if event.attendees.length < 4
-      [attendees..., newAttendee] = event.attendees
-      mentions = attendees.map((user) -> "@#{user}").join(' ')
-      msg.send "#{mentions} #{event.toString()} での麻雀に @#{newAttendee} が参加されます"
+      msg.send Nodoka.messageOnAttended(event)
     else
-      mentions = event.attendees.map((user) -> "@#{user}").join(' ')
-      msg.send "@all #{event.toString()} での麻雀の面子が揃いました! #{mentions} です"
+      msg.send Nodoka.messageOnFilled(event)
