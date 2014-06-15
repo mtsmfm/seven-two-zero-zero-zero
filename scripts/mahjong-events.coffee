@@ -17,6 +17,9 @@ class MahjongEvent
   attend: (user) ->
     @attendees.push user
 
+  isFull: ->
+    @attendees.length == 4
+
 module.exports = (robot) ->
   event = null
 
@@ -31,6 +34,7 @@ module.exports = (robot) ->
   robot.respond /true$/i, (msg) ->
     # TODO ないときのメッセージ
     return unless event
+    return msg.send '面子が揃っちゃいました ><' if event.isFull()
 
     event.attend(msg.message.user.name)
 
