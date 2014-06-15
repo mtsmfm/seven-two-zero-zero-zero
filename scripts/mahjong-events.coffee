@@ -9,6 +9,7 @@ moment = require('moment')
 class MahjongEvent
   constructor: (@host, heldAt, @place) ->
     @heldAt = moment(heldAt, 'M/D H:m')
+    throw "Invalid format of date : #{heldAt}" unless @heldAt.isValid()
     @attendees = [@host]
 
   toString: ->
@@ -36,6 +37,9 @@ class Nodoka
     mentions = event.attendees.map((user) -> "@#{user}").join(' ')
     "@all #{event.toString()} での麻雀の面子が揃いました! #{mentions} です"
 
+  @messageInvalidFormat: ->
+    '面子募集のフォーマットがおかしいです (面子 月/日 時間- 場所)'
+
 module.exports = (robot) ->
   event = null
 
@@ -45,7 +49,7 @@ module.exports = (robot) ->
 
       msg.send Nodoka.messageOnCreated(event)
     catch
-      # TODO invalid だった場合の処理
+      msg.send Nodoka.messageInvalidFormat()
 
   robot.respond /true$/i, (msg) ->
     # TODO ないときのメッセージ
